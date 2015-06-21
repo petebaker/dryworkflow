@@ -9,13 +9,13 @@ Also see [the blog site](http://www.petebaker.id.au/r-package-dryworkflow "Peter
 To install please use the following:
 
 ```{r}
-library(devtools)  # available on cran (or github)
+library(devtools)  # available on CRAN (or github)
 devtools::install_github("petebaker/dryworkflow")
 ```
 
 ### Prerequisites
 
-To use makefile definitions and version control using git, you need to install
+To use Makefile definitions and version control using git, you need to install
 - GNU Make  [http://www.gnu.org/software/make/](http://www.gnu.org/software/make/)
 - R         [http://www.r-project.org/](http://www.r-project.org/)
 - latexmk   [http://www.ctan.org/pkg/latexmk/](http://www.ctan.org/pkg/latexmk/)
@@ -26,7 +26,7 @@ Note that **Windows** users can install Rtools (available from CRAN) to get a wo
 - pandoc   [http://johnmacfarlane.net/pandoc/](http://johnmacfarlane.net/pandoc/)
 - miktex   [http://miktex.org/](http://miktex.org/)
 
-**MACOSX** users should install a recent version of *Xcode CLT* (Xcode command line tools) and *Homebrew* in order to install *make* and *git*. Unfortnately, I don't yet know much about Macs as my brand new (and first) MacBook Pro is still in for repairs. For some hints try [http://www.moncefbelyamani.com/how-to-install-xcode-homebrew-git-rvm-ruby-on-mac/](http://www.moncefbelyamani.com/how-to-install-xcode-homebrew-git-rvm-ruby-on-mac/). Finally, to produce pdf reports *MacTex* [https://tug.org/mactex/](https://tug.org/mactex/) is recommended.
+**MACOSX** users should install a recent version of *Xcode CLT* (Xcode command line tools) and *Homebrew* in order to install *make* and *git*. Unfortunately, I don't yet know much about Macs as my brand new (and first) MacBook Pro is still in for repairs. For some hints try [http://www.moncefbelyamani.com/how-to-install-xcode-homebrew-git-rvm-ruby-on-mac/](http://www.moncefbelyamani.com/how-to-install-xcode-homebrew-git-rvm-ruby-on-mac/). Finally, to produce pdf reports *MacTex* [https://tug.org/mactex/](https://tug.org/mactex/) is recommended.
 
 In **linux**, if they aren't already installed, simply install these
 packages using the system package manager.
