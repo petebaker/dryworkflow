@@ -1,0 +1,103 @@
+## File:    .gitignore
+## Purpose: Specifies untracked files for git to ignore 
+##          Some from http://help.github.com/ignore-files/ 
+##          and added R/latex/emacs/RStudio specific etc
+## Note: 1) goes in root of project and is NOT stored with git repo
+##       2) you may wish to add some files which are excluded here like
+##          something.log or somthing.pdf. Simply use 'git add filename'
+##          which will track specified file. Alternatively, comment the
+##          pattern(s) below
+##       3) you may wish to allow certain files like pdfs or docs in
+##          subdirectories. To allow a pattern in a specific subdirectory
+##          then create a .gitignore file in that directory using a text
+##          editor and use negate (!).  See 'man gitignore'
+
+
+########################################################
+# R output                                             #
+########################################################
+
+.Rhistory
+*.Rout
+*_Rout.txt
+Rplots.pdf
+*.pdf
+*.png
+*.tiff
+*.jpg
+*.jpeg
+
+##########################
+# Packages/zip/iso files #
+##########################
+# it's better to unpack these files and commit the raw source
+# git has its own built in compression methods
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+#############
+# Databases #
+#############
+*.sql
+*.sqlite
+
+#############
+# latex #
+#############
+*.aux
+*.glo
+*.idx
+*.log
+*.toc
+*.ist
+*.acn
+*.acr
+*.alg
+*.bbl
+*.blg
+*.dvi
+*.glg
+*.gls
+*.ilg
+*.ind
+*.lof
+*.lot
+*.maf
+*.mtc
+*.mtc1
+*.out
+*.synctex.gz
+*.pdfsync
+*.nav
+*.snm
+
+#############
+# latexmk #
+#############
+
+*.fdb_latexmk
+*.fls
+
+##################
+# C object files
+##################
+*.o
+*.so
+
+##################
+# RStudio files
+##################
+.Rproj.user
+
+#####################
+# emacs backups etc #
+#####################
+*~
+\#*\#
+auto/

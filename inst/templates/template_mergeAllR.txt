@@ -1,0 +1,139 @@
+------- START: DELETE THIS SECTION -------------------------------
+File: template_mergeAllR.txt
+This file is used by 'createFromTemplate.R' to create an .R syntax file
+It can be used as a basis for a modified template and should work as
+long as the fields below are found in the syntax after the end of this section.
+To use without to much reprogramming all fields should use the names below
+Fields to be changed:
+@@PROJECT.STEP@@ name of process to perform - mergeAll, etc read, clean, ...
+@@SYNTAX.FILE@@ name of R syntax file to read data (eg mergeAll.R)
+@@DATE.CREATED@@ date R syntax file created (eg Mon Apr 13 10:09:15 2015)
+@@AUTHOR@@ Author - either provided or obtained from git settings
+@@DATAFRAME.INPUT@@ character strings of 'cleaned' dataframe names
+                        (assigned ??)
+@@RDATA.INPUT@@ character strings of 'cleaned' datafile names
+@@DATAFRAME.SAVED@@ merged data frame name
+@@DATAFILE@@ names of data files originally read in
+                                 (eg c("data1.csv", "data2.dta", ..)
+@@DIR.DATA.INPUT@@ name of directory containing data file (eg ../data/derived)
+@@RDATA.SAVED@@ file name of .RData file to be stored  (eg mergedAll.RData)
+@@DIR.DATA.SAVED@@ Directory to save codebook RData file  (eg ../data/derived)
+@@LIBRARIES@@ eg.
+require(dryworkflow) # Some of these libraries load others too
+require(foreign)
+require(Hmisc)
+@@DATAFRAME.SAVED@@ (eg mergedData)
+@@MYLIB.FILES@@ vector of source commands for filenames
+source(file.path('../lib', 'pretend.R')
+source(file.path('../lib', 'tttt.R')
+@@MYLIB.DIR@@ (eg ./lib) - NOT USED CURRENTLY
+@@LICENCE@@ (eg licence GPL3 see <http://www.gnu.org/licenses/>)
+------- END: DELETE THIS SECTION ---------------------------------
+### Warning: This file is highly unlikely to work without modification
+###
+### File:    @@SYNTAX.FILE@@
+### Purpose: @@PROJECT.STEP@@: cleaned data files in directory
+##           '@@DIR.DATA.INPUT@@'
+###          and store in '@@RDATA.SAVED@@' in directory '@@DIR.DATA.SAVED@@'
+### Created: @@DATE.CREATED@@ by 'dryworkflow::createProjectSkeleton'
+### Author:  @@AUTHOR@@
+### Licence: @@LICENCE@@
+
+### Changelog: -- insert comments and times re changes here --
+
+## Specific libraries to be used. NB: can also be loaded in .Rprofile
+@@LIBRARIES@@
+
+## Source any R functions in own library directory
+## Add any extra function files here or comment or delete to not load
+## NB: You can source (load) all files in a directory 'myLib' with
+##     lapply(Sys.glob(file.path("myLib", "*.R")), source)
+@@MYLIB.FILES@@
+
+DATAFILES <- @@DATAFILE@@
+DATAFRAMES <- @@DATAFRAME.INPUT@@
+RDATAFILES <- @@RDATA.INPUT@@
+
+if (length(DATAFRAMES) != length(RDATAFILES)){
+  cat("Error: each data frame needs file\n\n")
+} else {
+ names(DATAFRAMES) <- names(RDATAFILES) <- DATAFILES
+}
+
+### Read in R data files in '@@DIR.DATA.INPUT@@'
+### Files: @@RDATA.INPUT@@
+@@INPUT.COMMANDS@@
+
+### Data frames to be combined:
+DATAFRAMES
+
+### Description of data frames
+lapply(DATAFRAMES,
+       function(x) cat(x, ":\n", comment(get(x)), sep = ""))
+
+### NB: ------------------------------------------------------------------
+
+### Warning: You may wish to run some of this file interactively after
+###          data files are read in. Column names that are in common
+###          and that are present in one file only are printed along
+###          with structure dimensions etc to help identify what's
+###          different.
+###          It may be prudent to reread and/or rename the variable names
+###          before attempting to merge because incorrect specification
+###          may make merge times excessive. In particular, you may
+###          need to specify appropriate ID column(s) for merging.
+
+### Also: instead of using merge below it may be easier to bind rows
+###       using something like
+## ## Merging data sets by row binding variables in common
+## in.common <- intersect(names(get(DATAFRAMES[1])), names(get(DATAFRAMES[2])))
+## @@DATAFRAME.SAVED@@ <- rbind(get(DATAFRAMES[1])[,in.common],
+##                              get(DATAFRAMES[2][,in.common]))
+## for (J in 2:length(DATAFRAMES)){
+##   in.common <- intersect( in.common, names(get(DATAFRAMES[J])))
+##   ## Row binding data frames
+##   @@DATAFRAME.SAVED@@ <- rbind(@@DATAFRAME.SAVED@@[,in.common],
+##                                get(DATAFRAMES[J])[,in.common])
+## }
+
+## Merging data sets using 'merge'
+cat('Merge', DATAFRAMES[1], ',', DATAFRAMES[2], '\n')
+
+#### Overall comparison: -------------------------------------------
+compare::compare(get(DATAFRAMES[1]), get(DATAFRAMES[2]), allowAll=TRUE)
+
+### Variable Names in common --------------------------------------
+intersect(names(get(DATAFRAMES[1])), names(get(DATAFRAMES[2])))
+cat('Column names in', DATAFRAMES[1], 'not in', DATAFRAMES[2]\n
+setdiff(names(get(DATAFRAMES[1])), names(get(DATAFRAMES[2])))
+cat('Column names in', DATAFRAMES[2], 'not in', DATAFRAMES[1]\n
+setdiff(names(get(DATAFRAMES[2])), names(get(DATAFRAMES[1])))
+## @@DATAFRAME.SAVED@@ <- merge(get(DATAFRAMES[1]), get(DATAFRAMES[2]),
+##                              by = 'ID', all=TRUE)
+@@DATAFRAME.SAVED@@ <- merge(get(DATAFRAMES[1]), get(DATAFRAMES[2]), all=TRUE)
+
+for (J in 2:length(DATAFRAMES)){
+  cat('Merge @@DATAFRAME.SAVED@@ with', DATAFRAMES[J], '\n')
+  cat('#### Overall comparison:\n')
+  print(compare::compare(@@DATAFRAME.SAVED@@, get(DATAFRAMES[J]),
+                         allowAll=TRUE))
+  cat('## +++++++ Variable Names in common\n')
+  print(intersect(names(@@DATAFRAME.SAVED@@), names(get(DATAFRAMES[J]))))
+  cat('Column names in @@DATAFRAME.SAVED@@ not in', DATAFRAMES[J], '\n')
+  print(setdiff(names(@@DATAFRAME.SAVED@@), names(get(DATAFRAMES[J]))))
+  cat('Column names in', DATAFRAMES[J], 'not in @@DATAFRAME.SAVED@@\n')
+  print(setdiff(names(get(DATAFRAMES[J])), names(@@DATAFRAME.SAVED@@)))
+##  @@DATAFRAME.SAVED@@ <- merge(@@DATAFRAME.SAVED@@, get(DATAFRAMES[J]),
+##                               by = 'ID', all=TRUE)
+  @@DATAFRAME.SAVED@@ <- merge(@@DATAFRAME.SAVED@@, get(DATAFRAMES[J]),
+                               all=TRUE)
+}
+
+### Store data for subsequent analysis  ---------------------------
+comment(@@DATAFRAME.SAVED@@) <-
+  paste("Data merged from specified data files at", date())
+
+str(@@DATAFRAME.SAVED@@)
+
+save(@@DATAFRAME.SAVED@@, DATAFRAMES,
+  file = file.path("@@DIR.DATA.SAVED@@", "@@RDATA.SAVED@@"))

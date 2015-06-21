@@ -1,0 +1,14 @@
+Variable,Old.Variable,Label,Factor.Levels,Factor.Type
+ID,codea,"Subject ID",Continuous,
+bmi.21,bmi22,"BMI at 21 Years",Continuous,
+bpSys.21,NA,"Mean Systolic Blood Pressure at 21 Years",Continuous,
+ysrExter.14,jexter,"YSR: externalising at 14 years",Continuous,
+ysrInter.14,jinter,"YSR: internalising at 14 years",Continuous,
+ysrAggre.14,jaggre,"YSR: aggression at 14 years",Continuous,
+matEducat,ra80,"Maternal Education","1=Incomplete High",Ordered
+,,,"2=Complete High",
+,,,"3=Post High",
+familyIncome,ra90,"Recoded Income Phase A","1=$10399 or less",Nominal
+,,,"2=$10400 or more",
+sex,c45,"Sex of baby",1=Male,Factor
+,,,2=Female,

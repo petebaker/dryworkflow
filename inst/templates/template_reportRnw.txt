@@ -1,0 +1,213 @@
+------- START: DELETE THIS SECTION -------------------------------
+File: template_reportRmd.txt
+This file is used by 'createFromTemplate.R' to create a R markdown file
+     report___.Rmd
+It can be used as a basis for a modified template and should work as
+long as the fields below are found in the syntax after the end of this section.
+To use without too much reprogramming all fields should use the names below
+
+It is assumed that we wish to import the clean version of data,
+summary and analyse dataframes as well for reporting
+
+Note that a similar process is available for these types of report/presentation
+reportRmd, reportRnw, presentRmd or beamerRnw
+
+Fields to be changed:
+@@SYNTAX.FILE@@ name of Rmd or Rnw markdown file for report
+         (eg data1_csv.Rmd)
+@@DATE.CREATED@@ date R syntax file created (eg Mon Apr 13 10:09:15 2015)
+@@AUTHOR@@         Author - either provided or obtained from git settings
+@@TITLE.PROJECT@@  Title string for project
+@@DATAFILE@@       original data file name
+@@DIR.DATA.INPUT@@ name of directory containing input data file
+          (eg ../data/derived)
+@@RDATA.CLEAN.SAVED@@    RData file containing cleaned data
+@@RDATA.SUMMARY.SAVED@@  RData file containing summary results 
+@@RDATA.ANALYSIS.SAVED@@ RData file containing analysis results
+@@DATAFRAME.CLEAN@@    Dataframe containing cleaned data
+@@DATAFRAME.SUMMARY@@  Dataframe containing summary results 
+@@DATAFRAME.ANALYSIS@@ Dataframe containing analysis results
+@@LIBRARIES@@ eg.
+require(dryworkflow) # Some of these libraries load others too
+require(foreign)
+require(Hmisc)
+@@MYLIB.DIR@@   (eg ../lib) NB: not used but set outside calling template
+@@MYLIB.FILES@@ vector of source commands for filenames
+source(file.path(@@MYLIB.DIR@@, 'pretend.R')
+source(file.path(@@MYLIB.DIR@@, 'tttt.R')
+------- END: DELETE THIS SECTION ---------------------------------
+%% Filename:   @@SYNTAX.FILE@@
+%% Author:     @@AUTHOR@@
+%% Created at: @@DATE.CREATED@@ by package 'dryworkflow'
+%% Change log: Insert dates and changes here
+%%
+%%
+
+%% Some features here from knitr examples on github - see
+%% https://raw.githubusercontent.com/yihui/knitr/master/inst/examples/knitr-minimal.Rnw
+
+\documentclass[a4paper]{article}
+\usepackage[sc]{mathpazo}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{verbose,tmargin=2.5cm,bmargin=2.5cm,lmargin=2.5cm,rmargin=2.5cm}
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{2}
+\usepackage{url}
+\usepackage[unicode=true,pdfusetitle,
+ bookmarks=true,bookmarksnumbered=true,bookmarksopen=true,bookmarksopenlevel=2,
+ breaklinks=false,pdfborder={0 0 1},backref=false,colorlinks=false]
+ {hyperref}
+\hypersetup{
+ pdfstartview={XYZ null null 1}}
+
+\begin{document}
+
+%% Before you create a report, check settings in next chunk, modify
+%% accordingly and also change packages and options above.
+
+<<setup, include=FALSE, cache=FALSE>>=
+library(knitr)
+# set global chunk options
+opts_chunk$set(fig.path='figure', fig.align='center', fig.show='hold')
+options(formatR.arrow=TRUE,width=90)
+@
+
+\title{@@TITLE.PROJECT@@}
+\author{@@AUTHOR@@}
+\address{@@ADDRESS@@}  % separate lines with \\
+\maketitle
+
+This is a template for the data file *@@DATAFILE@@*.
+
+<<setupDataAndInput, echo=FALSE, messages=FALSE, warnings=FALSE, errors=TRUE>>=
+SUBSET <- TRUE               # subset - change this
+if (SUBSET){
+  N.VARS <- 5                # just summarise first 5 variables
+  N.CASES <- 100             # just summarise first 100 rows
+}
+library(Hmisc)
+library(xtable)
+library(knitr)
+library(Rmarkdown)
+library(pander)
+library(car)
+@@LIBRARIES@@
+
+## Source any R functions in own library directory
+## Add any extra function files here or comment or delete to not load
+## NB: You can source (load) all files in a directory 'myLib' with
+##     lapply(Sys.glob(file.path("myLib", "*.R")), source)
+@@MYLIB.FILES@@
+
+load(file.path("@@DIR.DATA.INPUT@@", "@@RDATA.CLEAN.SAVED@@"))
+load(file.path("@@DIR.DATA.INPUT@@", "@@RDATA.SUMMARY.SAVED@@"))
+load(file.path("@@DIR.DATA.INPUT@@", "@@RDATA.ANALYSIS.SAVED@@"))
+if (SUBSET){
+@@DATAFRAME.CLEAN@@ <- @@DATAFRAME.CLEAN@@[1:N.CASES, 1:N.VARS]
+} else {
+  N.CASES <- dim(@@DATAFRAME.CLEAN@@)[1]
+  N.VARS <- dim(@@DATAFRAME.CLEAN@@)[2]
+}
+@
+
+\section{Background}
+
+Insert description of project and aims.
+
+The structure of this report is as follows. Summary statistics are
+shown in Section~\ref{sec:summary} with tables and plots in Sections
+\ref{sec:summary-tables} and \ref{sec:summary-plots}, respectively.
+
+\section{Summary Statistics}
+\label{sec:summary}
+
+\bfseries{Note to self:} Guessing this may not work but should
+  substitute something that does.
+
+Data were cleaned and summary statistics presented here are for
+\Sexpr{ifelse(SUBSET, "a subset of", "")} \Sexpr{N.CASES} cases from
+\Sexpr{N.VARS} variables.
+
+\subsection{Summary Tables}
+\label{sec:summary-tables}
+
+Sometimes \texttt{numSummary} can produce problematic output for
+\texttt{knitr} but really should be OK given it is used inside R
+Commander.
+
+<<summary1, echo=FALSE, results='asis'>>=
+knitr::kable(Rcmdr::numSummary(@@DATAFRAME.CLEAN@@))
+@
+
+This may be useful too:
+
+<<summary2, echo=FALSE, results='asis'>>=
+knitr::kable(psych::describe(@@DATAFRAME.CLEAN@@))
+@
+
+But I'm guessing this simply doesn't work. Table produced previously
+and so doesn't need redoing/recalculating but just outputting.
+
+<<summary3, results='asis'>>=
+xt <- xtable(table1, label = 'tab:tableX', caption = "Summary statistics")
+print(xt)
+@
+
+<<summary4, results='asis', >>=
+latex(table1, label = 'tab:tableX2', caption = "Summary statistics 2")
+@
+
+We see summary results in Tables \ref{tab:tableX} and \ref{tab:tableX2}.
+
+\subsection{Summary Plots}
+\label{sec:summary-plots}
+
+And perhaps some of these plots are present too from the summary step
+conducted previously.
+
+<<plot1, echo=FALSE, fig.cap = "Pairwise plots of variables">>
+if (exists(ggpairs1)) ggpairs1
+@
+
+For a perhaps interesting plot, see Figures~\ref{fig:plot1} and
+\ref{fig.plot}.
+
+\textbf{Is this going to crash things if libraries not installed?}
+
+<<plot2, echo=FALSE, fig.cap = "Mosaic Plot">>
+if (exists(mosaic1)) mosaic1
+@
+
+\section{Statistical Analysis}
+
+Ideally, you analyse data using \texttt{R} and simply output and
+discuss the results here.
+
+<<stats1, echo=FAlSE, results='asis'>>=
+if (exists(mod1) {
+  knitr::kable(summary(mod1))
+  knitr::kable(anova(mod1))
+  knitr::kable(Anova(mod1))
+@
+
+And perhaps some residual plots
+
+<<resid.plots, echo=FALSE>>=
+if (exists(mod1)) plot(mod1)
+@
+
+<<resid.plots2, echo=FALSE>>=
+if (exists(mod1)) car::residualPlots(mod1)
+@
+
+If the \texttt{effects} package is installed then could plot effects.
+
+<<effects1, echo=FALSE>>=
+if (exists(mod1)) {
+  library(effects)
+  plot(allEffects(mod1))
+}
+@
+
+\end{document}

@@ -1,0 +1,72 @@
+------- START: DELETE THIS SECTION -------------------------------
+File: template_codebookR.txt
+This file is used by 'createFromTemplate.R' to create a read.R syntax file
+It can be used as a basis for a modified template and should work as
+long as the fields below are found in the syntax after the end of this section.
+To use without to much reprogramming all fields should use the names below
+Fields to be changed:
+@@PROJECT.STEP@@ name of process to perform - read, clean, analyse, analyse
+@@SYNTAX.FILE@@ name of R syntax file to read codebook
+                                      (eg read-codebook-data1_csv.R)
+@@DATE.CREATED@@ date R syntax file created (eg Mon Apr 13 10:09:15 2015)
+@@AUTHOR@@ Author - either provided or obtained from git settings
+@@DATAFILE@@ name of data file to be read in (eg data1.csv)
+@@CODEBOOK@@ name of codebook file to be read in (eg data1_codebook.csv)
+@@DIR.DATA.INPUT@@ name of directory containing codebook (eg ../data/codebook)
+@@DATA.RDATA.FILE@@ full file name of .RData file to be stored
+                             (eg ../data/derived/data1_csv.RData)
+@@RDATA.SAVED@@ full file name of .RData file to be stored
+                             (eg ../data/derived/data1_codebook.RData)
+@@LIBRARIES@@ eg.
+require(dryworkflow) # Some of these libraries load others too
+require(foreign)
+require(Hmisc)
+@@INPUT.COMMANDS@@
+###: Read in code book and apply to data file. eg
+CODEBOOK <- readCodeBook('../data/codebook/data1_codebook.csv')
+applyCodeBook(data1, CODEBOOK)
+@@DATA.DATAFRAME@@ (eg data1)
+@@DATAFRAME.SAVED@@ (eg data1_codebook)
+@@MYLIB.FILES@@ vector of source commands for filenames
+source(file.path('../lib', 'prestend.R')
+source(file.path('../lib', 'tttt.R')
+@@MYLIB.DIR@@ (eg ./lib) - NOT USED CURRENTLY
+@@LICENCE@@ (eg licence GPL3 see <http://www.gnu.org/licenses/>)
+------- END: DELETE THIS SECTION ---------------------------------
+### File:    @@SYNTAX.FILE@@
+### Purpose: read @@PROJECT.STEP@@  '@@DATAFILE@@'
+###          in directory '@@DIR.DATA.INPUT@@'
+###          and store in '@@RDATA.SAVED@@' in 
+### Created: @@DATE.CREATED@@ by 'dryworkflow::createProjectSkeleton'
+### Author:  @@AUTHOR@@
+### Licence: @@LICENCE@@
+
+### Changelog: -- insert comments and times re changes here --
+
+## Specific libraries to be used. NB: can also be loaded in .Rprofile
+@@LIBRARIES@@
+
+## Source any R functions in own library directory
+## Add any extra function files here or comment or delete to not load
+## NB: You can source (load) all files in a directory 'myLib' with
+##     lapply(Sys.glob(file.path("myLib", "*.R")), source)
+@@MYLIB.FILES@@
+
+### Read in codebook file '@@DATAFILE@@' in '@@DIR.DATA.INPUT@@'
+@@INPUT.COMMANDS@@
+
+## Data structure
+str(@@DATAFRAME.SAVED@@)
+
+### You can insert any transformations here or tidy up variable names
+### and so on but ideally these should be carried out when cleaning
+### the data so that an unchanged original version is stored initially
+### but minor tweaks could be inserted here
+
+### Store data for subsequent analysis
+comment(@@DATAFRAME.SAVED@@) <-
+  paste("Read codebook '@@DATAFILE@@' in '@@DIR.DATA.INPUT@@' at",
+        date())
+
+save(@@DATAFRAME.SAVED@@,
+  file = file.path("@@DIR.DATA.SAVED@@", "@@RDATA.SAVED@@"))

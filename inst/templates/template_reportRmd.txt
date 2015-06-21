@@ -1,0 +1,167 @@
+------- START: DELETE THIS SECTION -------------------------------
+File: template_reportRmd.txt
+This file is used by 'createFromTemplate.R' to create a R markdown file
+     report___.Rmd
+It can be used as a basis for a modified template and should work as
+long as the fields below are found in the syntax after the end of this section.
+To use without too much reprogramming all fields should use the names below
+
+It is assumed that we wish to import the clean version of data,
+summary and analyse dataframes as well for reporting
+
+Note that a similar process is available for these types of report/presentation
+reportRmd, reportRnw, presentRmd or beamerRnw
+
+Fields to be changed:
+@@SYNTAX.FILE@@ name of Rmd or Rnw markdown file for report
+         (eg data1_csv.Rmd)
+@@DATE.CREATED@@ date R syntax file created (eg Mon Apr 13 10:09:15 2015)
+@@AUTHOR@@         Author - either provided or obtained from git settings
+@@TITLE.PROJECT@@  Title string for project
+@@DATAFILE@@       original data file name
+@@DIR.DATA.INPUT@@ name of directory containing input data file
+          (eg ../data/derived)
+@@RDATA.CLEAN.SAVED@@    RData file containing cleaned data
+@@RDATA.SUMMARY.SAVED@@  RData file containing summary results 
+@@RDATA.ANALYSIS.SAVED@@ RData file containing analysis results
+@@DATAFRAME.CLEAN@@    Dataframe containing cleaned data
+@@DATAFRAME.SUMMARY@@  Dataframe containing summary results 
+@@DATAFRAME.ANALYSIS@@ Dataframe containing analysis results
+@@LIBRARIES@@ eg.
+require(dryworkflow) # Some of these libraries load others too
+require(foreign)
+require(Hmisc)
+@@MYLIB.DIR@@   (eg ../lib) NB: not used but set outside calling template
+@@MYLIB.FILES@@ vector of source commands for filenames
+source(file.path(@@MYLIB.DIR@@, 'pretend.R')
+source(file.path(@@MYLIB.DIR@@, 'tttt.R')
+------- END: DELETE THIS SECTION ---------------------------------
+---
+title: "@@TITLE.PROJECT@@"
+author: "@@AUTHOR@@ @@ADDRESS@@" 
+date: "@@DATE.CREATED@@"
+output:
+  html_document:
+    toc: true
+    theme: united
+  pdf_document:
+    toc: true
+    highlight: zenburn
+---
+
+This is a template for the data file *@@DATAFILE@@*.
+
+**Before you create a report, check settings in next chunk, modify
+accordingly and then remove this sentence.**
+
+```{r, echo=FALSE, messages=FALSE, warnings=FALSE, errors=TRUE}
+SUBSET <- TRUE               # subset - change this
+if (SUBSET){
+  N.VARS <- 5                # just summarise first 5 variables
+  N.CASES <- 100             # just summarise first 100 rows
+}
+library(knitr)
+library(Rmarkdown)
+library(pander)
+library(car)
+@@LIBRARIES@@
+
+## Source any R functions in own library directory
+## Add any extra function files here or comment or delete to not load
+## NB: You can source (load) all files in a directory 'myLib' with
+##     lapply(Sys.glob(file.path("myLib", "*.R")), source)
+@@MYLIB.FILES@@
+
+load(file.path("@@DIR.DATA.INPUT@@", "@@RDATA.CLEAN.SAVED@@"))
+load(file.path("@@DIR.DATA.INPUT@@", "@@RDATA.SUMMARY.SAVED@@"))
+load(file.path("@@DIR.DATA.INPUT@@", "@@RDATA.ANALYSIS.SAVED@@"))
+if (SUBSET){
+@@DATAFRAME.CLEAN@@ <- @@DATAFRAME.CLEAN@@[1:N.CASES, 1:N.VARS]
+} else {
+  N.CASES <- dim(@@DATAFRAME.CLEAN@@)[1]
+  N.VARS <- dim(@@DATAFRAME.CLEAN@@)[2]
+}
+```
+
+# Summary Statistics
+
+**Note to self:** Guessing this may not work but should substitute
+  something that does.
+
+Data were cleaned and summary statistics presented here are for
+`r ifelse(SUBSET, "a subset of", "")`
+`r N.CASES` cases from `r N.VARS` variables.
+
+## Summary Tables
+
+Sometimes *numSummary* can produce problematic output for *knitr* but
+really should be OK given it is used inside R Commander.
+
+```{r, results='asis'}
+knitr::kable(Rcmdr::numSummary(@@DATAFRAME.CLEAN@@))
+```
+
+This may be useful too:
+
+```{r, results='asis'}
+knitr::kable(psych::describe(@@DATAFRAME.CLEAN@@))
+```
+
+But I'm guessing this simply doesn't work. Table produced previously
+and so doesn't need redoing/recalculating but just outputting.
+
+```{r, results='asis'}
+knitr::kable(table1)
+```
+
+## Summary Plots
+
+And perhaps some of these plots are present too from the summary step
+conducted previously.
+
+```{r, echo=FALSE}
+if (exists(ggpairs1)) ggpairs1
+```
+
+```{r, echo=FALSE}
+if (exists(mosaic1)) mosaic1
+```
+
+# Statistical Analysis
+
+Ideally, you analyse data using *R* and simply output and discuss the
+results here.
+
+```{r, echo=FAlSE, results='asis'}
+if (exists(mod1) {
+  knitr::kable(summary(mod1))
+  knitr::kable(anova(mod1))
+  knitr::kable(Anova(mod1))
+}
+```
+
+And perhaps some residual plots
+
+```{r, echo=FALSE}
+if (exists(mod1)) plot(mod1)
+```
+
+```{r, echo=FALSE}
+if (exists(mod1)) car::residualPlots(mod1)
+```
+
+If present than could plot effects.
+
+```{r, echo=FALSE}
+if (exists(mod1)) {
+  library(effects)
+  plot(allEffects(mod1))
+}
+```
+
+For more information about *R* markdown, please see
+<http://rmarkdown.rstudio.com>.
+
+Note that an 'echo = FALSE' parameter was added to the code chunk to
+prevent printing of the R code that generated the plot. You can find
+out more about options at <http://yihui.name/knitr/options/>.

@@ -1,0 +1,85 @@
+------- START: DELETE THIS SECTION -------------------------------
+File: template_cleanR.txt
+This file is used by 'createFromTemplate.R' to create a clean____.R syntax file
+It can be used as a basis for a modified template and should work as
+long as the fields below are found in the syntax after the end of this section.
+To use without too much reprogramming all fields should use the names below
+Fields to be changed:
+@@PROJECT.STEP@@ name of process to perform - read, clean, plot, analyse
+@@DATAFRAME.INPUT@@ (eg data1)
+@@DATAFRAME.SAVED@@ (eg data1_cl) (set unless reading raw data or codebook)
+@@SYNTAX.FILE@@ name of R syntax file to read/clean/plot/analyse data
+         (eg clean-data1_csv.R NB: set outside createSyntax() as
+	     @@PROJECT.STEP@@-dataFileName.R)
+@@DATE.CREATED@@ date R syntax file created (eg Mon Apr 13 10:09:15 2015)
+@@AUTHOR@@ Author - either provided or obtained from git settings
+@@DIR.DATA.INPUT@@ name of directory containing input data file
+          (eg ../data/derived or ../data/original)
+@@DIR.DATA.SAVED@@ name of directory containing saved data file
+          (eg ../data/derived)
+@@RDATA.INPUT@@ file name of .RData file to be read in @@DIR.RDATA.INPUT@@
+                           (eg data1_csv.RData)
+@@RDATA.SAVED@@ file name of .RData file to be stored in @@DIR.RDATA.SAVED@@
+                           (eg data1_csv_clean.RData)
+@@LIBRARIES@@ eg.
+require(dryworkflow) # Some of these libraries load others too
+require(foreign)
+require(Hmisc)
+@@INPUT.COMMANDS@@ (eg load or read)
+load("../data/derived/dta1_csv.RData") -- OR --
+data1 <-
+  read.csv("../data/original/data1.csv")
+@@MYLIB.DIR@@   (eg ../lib)
+@@MYLIB.FILES@@ vector of source commands for filenames
+source(file.path(@@MYLIB.DIR@@, 'pretend.R')
+source(file.path(@@MYLIB.DIR@@, 'tttt.R')
+@@LICENCE@@ (eg licence GPL3 see <http://www.gnu.org/licenses/>)
+------- END: DELETE THIS SECTION ---------------------------------
+### File:    @@SYNTAX.FILE@@
+### Purpose: @@PROJECT.STEP@@ data from '@@DATAFILE@@' stored in 
+###          in file @@RDATA.INPUT@@ in directory '@@DIR.DATA.INPUT@@'
+###          and store in @@RDATA.SAVED@@ in directory '@@DIR.DATA.SAVED@@'
+### Created: @@DATE.CREATED@@ initially by package 'dryworkflow'
+### Author:  @@AUTHOR@@
+### Licence: @@LICENCE@@
+
+### Changelog: -- insert comments and times re changes here --
+
+## Specific libraries to be used. NB: can also be loaded in .Rprofile
+@@LIBRARIES@@
+
+## Source any R functions in own library directory
+## Add any extra function files here or comment or delete to not load
+## NB: You can source (load) all files in a directory 'myLib' with
+##     lapply(Sys.glob(file.path("myLib", "*.R")), source)
+@@MYLIB.FILES@@
+
+### Read/Load data in file @@DIR.DATA.INPUT@@/@@RDATA.INPUT@@  ---------
+@@INPUT.COMMANDS@@
+
+## Data structure(s)
+## ls.str() # uncomment this line to see structure of all objects in workspace
+str(@@DATAFRAME.INPUT@@)
+
+
+@@DATAFRAME.SAVED@@ <- @@DATAFRAME.INPUT@@
+
+### Clean data  -------------------------------------------------
+
+### Insert any transformations here, tidy up variable names, perform
+### checks, modify values (and ideally date and document here and
+### elsewhere)
+
+summary(@@DATAFRAME.SAVED@@)
+
+names(@@DATAFRAME.SAVED@@)
+
+### Store data for subsequent analysis  --------------------------
+
+oldComment <- comment(@@DATAFRAME.SAVED@@)
+newComment
+  <- paste("Data '@@DATAFRAME.INPUT@@' from '@@RDATA.INPUT@@' cleaned at", date())
+comment(@@DATAFRAME.SAVED@@) <- c(newComment, oldComment)
+
+save(@@DATAFRAME.SAVED@@,
+  file = file.path("@@DIR.DATA.SAVED@@", "@@RDATA.SAVED@@"))

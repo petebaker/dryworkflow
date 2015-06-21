@@ -1,0 +1,171 @@
+------- START: DELETE THIS SECTION -------------------------------
+File: template_summaryR.txt
+This file is used by 'createFromTemplate.R' to create a summary____.R
+syntax file
+It can be used as a basis for a modified template and should work as
+long as the fields below are found in the syntax after the end of this section.
+To use without too much reprogramming all fields should use the names below
+Fields to be changed:
+@@PROJECT.STEP@@ name of process to perform - read, clean, summary, analyse
+@@DATAFRAME.INPUT@@ (eg data1)
+@@DATAFRAME.SAVED@@ (eg data1_cl) (set unless reading raw data or codebook)
+@@SYNTAX.FILE@@ name of R syntax file to read/clean/plot/analyse data
+         (eg clean-data1_csv.R NB: set outside createSyntax() as
+	     @@PROJECT.STEP@@-dataFileName.R)
+@@DATE.CREATED@@ date R syntax file created (eg Mon Apr 13 10:09:15 2015)
+@@AUTHOR@@ Author - either provided or obtained from git settings
+@@DIR.DATA.INPUT@@ name of directory containing input data file
+          (eg ../data/derived or ../data/original)
+@@DIR.DATA.SAVED@@ name of directory containing saved data file
+          (eg ../data/derived)
+@@RDATA.INPUT@@ file name of .RData file to be read in @@DIR.RDATA.INPUT@@
+                           (eg data1_csv.RData)
+@@RDATA.SAVED@@ file name of .RData file to be stored in @@DIR.RDATA.SAVED@@
+                           (eg data1_csv_clean.RData)
+@@LIBRARIES@@ eg.
+require(dryworkflow) # Some of these libraries load others too
+require(foreign)
+require(Hmisc)
+@@INPUT.COMMANDS@@ (eg load or read)
+load("../data/derived/dta1_csv.RData") -- OR --
+data1 <-
+  read.csv("../data/original/data1.csv")
+@@MYLIB.DIR@@   (eg ../lib)
+@@MYLIB.FILES@@ vector of source commands for filenames
+source(file.path(@@MYLIB.DIR@@, 'pretend.R')
+source(file.path(@@MYLIB.DIR@@, 'tttt.R')
+@@LICENCE@@ (eg licence GPL3 see <http://www.gnu.org/licenses/>)
+------- END: DELETE THIS SECTION ---------------------------------
+### File:    @@SYNTAX.FILE@@
+### Purpose: @@PROJECT.STEP@@ data from '@@DATAFILE@@' stored in 
+###          in file @@RDATA.INPUT@@ in directory '@@DIR.DATA.INPUT@@'
+###          and store in @@RDATA.SAVED@@ in directory '@@DIR.DATA.SAVED@@'
+### Created: @@DATE.CREATED@@ initially by package 'dryworkflow'
+### Author:  @@AUTHOR@@
+### Licence: @@LICENCE@@
+
+### Changelog: -- insert comments and times re changes here --
+
+## Specific libraries to be used. NB: can also be loaded in .Rprofile
+@@LIBRARIES@@
+
+## Source any R functions in own library directory
+## Add any extra function files here or comment or delete to not load
+## NB: You can source (load) all files in a directory 'myLib' with
+##     lapply(Sys.glob(file.path("myLib", "*.R")), source)
+@@MYLIB.FILES@@
+
+### Read/Load data in file @@DIR.DATA.INPUT@@/@@RDATA.INPUT@@  ---------
+@@INPUT.COMMANDS@@
+
+## Data structure(s)
+## ls.str() # uncomment this line to see structure of all objects in workspace
+str(@@DATAFRAME.INPUT@@)
+
+## Insert sensible summary commands here -------------------------------
+
+## ---------------------------------------------------------------------
+## Examples for possible summaries - DEMO - START HERE
+## ---------------------------------------------------------------------
+
+## if data set very large then this could take a long time
+## test with a sample of size N.SAMPLE
+
+N.SAMPLE <- 100
+N.COLS <- 10
+
+df1 <- ifelse(dim(@@DATAFRAME.INPUT@@)[1] > N.SAMPLE,
+       @@DATAFRAME.INPUT@@[sample(1:dim(@@DATAFRAME.INPUT@@)[1], N.SAMPLE),],
+       @@DATAFRAME.INPUT@@)
+
+## Summary statistics:
+
+cat("Summary statistics for (possibly a sample of) '@@DATAFRAME.INPUT@@':\n")
+summary(df1)
+if (require(RcmdrMisc))	{
+  RcmdrMisc::numSummary(df1)
+}
+    
+### Example: simple plot of data
+
+## boxplot of first continuous variable for first factor with 5 or
+## less groups as long as at least one of each or scatterplot
+## matrix if all numeric or moasic plot if 
+
+num.vars <- names(df1)[sapply(df1, is.numeric)]
+(n.num <- length(num.vars)) # no. of numeric variables
+
+fac.vars <- names(df1)[sapply(df1, function(x) is.factor(x) && nlevels(x)<=5)]
+(n.fac <- length(fac.vars)) # no. of factors with 5 or less levels
+
+if (n.num > 0 & n.fac > 0) { # boxplot if at least 1 numeric and 1 factor
+  x <- num.vars[1]
+  y <- fac.vars[1] # just in case ID stored as numeric
+  xlab <- attr(df1[,x], 'label')
+  ylab <- attr(df1[,y], 'label')
+  if (length(xlab) == 0) xlab <- x
+  if (length(ylab) == 0) ylab <- y
+  form1 <- formula(paste(y,'~', x))
+  print(bwplot(form1, data=df1, xlab=xlab, main=ylab))
+  form2 <- formula(paste(x,'~', y))
+  print(summary(lm(form2, data=df1)))
+
+  ## Example of Hmisc table
+  if (require(Hmisc)){
+    if (n.num > 6) {
+      x <- num.vars[1:6]
+      form3 <- formula(paste(y,'~', collapse(x, sep="+")))
+    } else {
+    form3 <- formula(paste(y,'~', collapse(num.vars, sep="+")))
+    }
+  table1 <- Hmisc::summary(form3, data = df1, method="reverse")
+  cat("Example summary table using 'Hmisc'")
+  print(table1)
+  } else {
+    table1 <- "'table1' not produced"
+  } 
+}
+
+if (n.num>1) { # if at least 2 numeric - matrix plot max of 4
+  print(splom(df1[, num.vars[1:min(c(4,n.num))]]))
+}
+
+if (n.fac>1) { # if at least 2 factors - plot first 2 if vcd installed
+  if (require(vcd)) {
+    require(vcd)
+    form1 <- paste("~", paste(fac.vars[1:2], collapse="+"))
+    mosaic1 <- mosaic(xtabs(form1, data = df1))
+  }
+}
+
+## Example of ggplot2 pairs plot from GGally
+if (require(GGally)){
+  ncols <- ncols(df1)
+  if (ncols > 6) {
+    ggpairs1 <- GGally::ggpairs(df1[,1:6])
+  } else {
+    ggpairs1 <- GGally::ggpairs(df1)
+  }
+  print(ggpairs1)
+} else {
+  ggpairs1 <- "ggpairs plot not produced"
+}
+
+## DEMO - END HERE -----------------------------------------------
+
+## save some summary results if sensible
+
+@@DATAFRAME.SAVED@@ <- list(data = @@DATAFRAME.INPUT@@,
+               	        table1 = ifelse(exists(table1), table1, NULL),
+	                ggpairs1 = ifelse(exists(ggpairs1), ggpairs1, NULL))
+
+oldComment <- comment(@@DATAFRAME.INPUT@@)
+(newComment
+  <- paste("Summaries for '@@DATAFRAME.INPUT@@' saved at",
+           date()))
+comment(@@DATAFRAME.SAVED@@) <- c(newComment, oldComment)
+
+### Store summary data for subsequent analysis/reports  ----------------
+
+save(@@DATAFRAME.SAVED@@, ggpairs1, mosaic1, table1, 
+  file = file.path("@@DIR.DATA.SAVED@@", "@@RDATA.SAVED@@"))

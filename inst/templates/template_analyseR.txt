@@ -1,0 +1,130 @@
+------- START: DELETE THIS SECTION -------------------------------
+File: template_analyseR.txt
+This file is used by 'createFromTemplate.R' to create a analyse____.R
+syntax file
+It can be used as a basis for a modified template and should work as
+long as the fields below are found in the syntax after the end of this section.
+To use without too much reprogramming all fields should use the names below
+Fields to be changed:
+@@PROJECT.STEP@@ name of process to perform - read, clean, analyse, analyse
+@@DATAFRAME.INPUT@@ (eg data1)
+@@DATAFRAME.SAVED@@ (eg data1_cl) (set unless reading raw data or codebook)
+@@SYNTAX.FILE@@ name of R syntax file to read/clean/plot/analyse data
+         (eg clean-data1_csv.R NB: set outside createSyntax() as
+	     @@PROJECT.STEP@@-dataFileName.R)
+@@DATE.CREATED@@ date R syntax file created (eg Mon Apr 13 10:09:15 2015)
+@@AUTHOR@@ Author - either provided or obtained from git settings
+@@DIR.DATA.INPUT@@ name of directory containing input data file
+          (eg ../data/derived or ../data/original)
+@@DIR.DATA.SAVED@@ name of directory containing saved data file
+          (eg ../data/derived)
+@@RDATA.INPUT@@ file name of .RData file to be read in @@DIR.RDATA.INPUT@@
+                           (eg data1_csv.RData)
+@@RDATA.SAVED@@ file name of .RData file to be stored in @@DIR.RDATA.SAVED@@
+                           (eg data1_csv_clean.RData)
+@@LIBRARIES@@ eg.
+require(dryworkflow) # Some of these libraries load others too
+require(foreign)
+require(Hmisc)
+@@INPUT.COMMANDS@@ (eg load or read)
+load("../data/derived/dta1_csv.RData") -- OR --
+data1 <-
+  read.csv("../data/original/data1.csv")
+@@MYLIB.DIR@@   (eg ../lib)
+@@MYLIB.FILES@@ vector of source commands for filenames
+source(file.path(@@MYLIB.DIR@@, 'pretend.R')
+source(file.path(@@MYLIB.DIR@@, 'tttt.R')
+@@LICENCE@@ (eg licence GPL3 see <http://www.gnu.org/licenses/>)
+------- END: DELETE THIS SECTION ---------------------------------
+### File:    @@SYNTAX.FILE@@
+### Purpose: @@PROJECT.STEP@@ data from '@@DATAFILE@@' stored in 
+###          in file @@RDATA.INPUT@@ in directory '@@DIR.DATA.INPUT@@'
+###          and store in @@RDATA.SAVED@@ in directory '@@DIR.DATA.SAVED@@'
+### Created: @@DATE.CREATED@@ initially by package 'dryworkflow'
+### Author:  @@AUTHOR@@
+### Licence: @@LICENCE@@
+
+### Changelog: -- insert comments and times re changes here --
+
+## Specific libraries to be used. NB: can also be loaded in .Rprofile
+@@LIBRARIES@@
+
+## Source any R functions in own library directory
+## Add any extra function files here or comment or delete to not load
+## NB: You can source (load) all files in a directory 'myLib' with
+##     lapply(Sys.glob(file.path("myLib", "*.R")), source)
+@@MYLIB.FILES@@
+
+### Read/Load data in file @@DIR.DATA.INPUT@@/@@RDATA.INPUT@@  ---------
+@@INPUT.COMMANDS@@
+
+## Data structure(s)
+## ls.str() # uncomment this line to see structure of all objects in workspace
+str(@@DATAFRAME.INPUT@@)
+
+## Insert sensible analysis commands here -------------------------------
+
+## ---------------------------------------------------------------------
+## Examples for a simple linear regression - DEMO - START HERE
+## ---------------------------------------------------------------------
+
+## if data set very large then this could take a long time
+## test with a sample of size N.SAMPLE
+
+N.SAMPLE <- 100
+
+df1 <- ifelse(dim(@@DATAFRAME.INPUT@@)[1] > N.SAMPLE,
+       @@DATAFRAME.INPUT@@[sample(1:dim(@@DATAFRAME.INPUT@@)[1], N.SAMPLE),],
+       @@DATAFRAME.INPUT@@)
+
+## determine continuous and categorial variables
+
+num.vars <- names(df1)[sapply(df1, is.numeric)]
+(n.num <- length(num.vars)) # no. of numeric variables
+
+fac.vars <- names(df1)[sapply(df1, function(x) is.factor(x) && nlevels(x)<=5)]
+(n.fac <- length(fac.vars)) # no. of factors with 5 or less levels
+
+## A simple linear regression analysis demo:
+
+if (n.num > 0) { # simple linear regression on either continuous or categorical
+
+  library(car)
+  library(effects) 
+
+  y <- num.vars[1]
+
+  if (n.num > 0){
+    x <- num.vars[2]
+  } else {
+    if (n.fac > 0)
+    x <- fac.vars[1]
+  }
+  cat("Simple lin. regression for '@@DATAFRAME.INPUT@@':\n")
+  cat("NB: Possibly a sample of size:", N.SAMPLE, "\n")
+  form1 <- formula(paste(y,'~', x))
+  print(summary(mod1 <- lm(form1, data=df1)))
+  car::qqPlot(mod1)
+  plot(effects1 <- effects::allEffects(mod1))
+} else {  #  no continuous variables
+  cat("No continuous variables\n")
+}	
+
+## DEMO - END HERE -----------------------------------------------
+
+## save analysis results if sensible and/or possible
+
+@@DATAFRAME.SAVED@@ <- list(data = @@DATAFRAME.INPUT@@,
+               	       mod1 = ifelse(exists(mod1), mod1, NULL),
+               	       effects1 = ifelse(exists(effects1), effects1, NULL))
+
+oldComment <- comment(@@DATAFRAME.INPUT@@)
+(newComment
+  <- paste("Simple analysis for '@@DATAFRAME.INPUT@@' saved at",
+           date()))
+comment(@@DATAFRAME.SAVED@@) <- c(newComment, oldComment)
+
+### Store simple analysis for subsequent analysis/reports  ----------------
+
+save(@@DATAFRAME.SAVED@@,
+  file = file.path("@@DIR.DATA.SAVED@@", "@@RDATA.SAVED@@"))

@@ -1,0 +1,10 @@
+READ=@@READ.DIR@@
+WORK=@@WORK.DIR@@
+REPORTS=@@REPORT.DIR@@
+outputs=$(READ) $(WORK) $(REPORTS)
+
+.PHONY: all
+all: $(outputs)
+
+$(outputs):
+	$(MAKE) --directory $@
