@@ -6,7 +6,7 @@ Also see [the blog site](http://www.petebaker.id.au/r-package-dryworkflow "Peter
 
 ## Installation
 
-To install please use the following:
+In *R* as Administrator, to install please use the following:
 
 ```{r}
 library(devtools)  # available on CRAN (or github)
