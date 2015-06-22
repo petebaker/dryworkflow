@@ -107,6 +107,8 @@ options("dryworkflow")
 #### A project with all default settings
 
 ```{r}
+## File: setupProject.R
+##
 ## copy .csv file and codebook from dryWorkflow package
 ## noting that normally you just place files in current directory
 ## and then run 'createProjectSkeleton'
@@ -119,6 +121,6 @@ file.copy(system.file('demoFiles', 'small2_codebook.csv',
 ##     before using 'make'
 createProjectSkeleton(dir.proj = "testProject2",
                       name.project = "Experiment 1",
-                      dontmove = "dryworkflow-Ex.R")
+                      dontmove = "setupProject.R")
 ```
 
