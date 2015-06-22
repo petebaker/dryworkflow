@@ -31,7 +31,7 @@ Note that **Windows** users can install Rtools (available from CRAN) to get a wo
 In **linux**, if they aren't already installed, simply install these
 packages using the system package manager.
 
-The easiest way to install *git* an *pandoc* on all platforms is to
+The easiest way to install *git* and *pandoc* on all platforms is to
 install *RStudio*. If you don't have a favourite programmer's editor
 that you already use for **R** then this is the best way to use **R**
 as well.  Install **RStudio** from http://rstudio.org. Note that you
