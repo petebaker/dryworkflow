@@ -35,7 +35,7 @@ The easiest way to install *git* and *pandoc* on all platforms is to
 install *RStudio*. If you don't have a favourite programmer's editor
 that you already use for **R** then this is the best way to use **R**
 as well.  Install **RStudio** from http://rstudio.org. Note that you
-may need to put he file containing *RStudio* etc in the *PATH*.
+may need to put the directory containing *RStudio* etc in the *PATH*.
 
 You can check that *make*, *git* and *pandoc* are installed by typing
 
