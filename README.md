@@ -10,7 +10,7 @@ In *R* as Administrator, to install please use the following:
 
 ```{r}
 library(devtools)  # available on CRAN (or github)
-devtools::install_github("petebaker/dryworkflow")
+devtools::install_github("petebaker/dryworkflow", dependencies = TRUE)
 ```
 
 ### Prerequisites
