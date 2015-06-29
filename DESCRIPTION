@@ -1,7 +1,7 @@
 Package: dryworkflow
 Title: DRY (Don't Repeat Yourself) Workflow for more efficient data analysis
-Version: 0.1.9016
-Date: 21/6/2015
+Version: 0.1.9017
+Date: 29/6/2015
 Authors@R: person("Peter", "Baker", email = "pete@petebaker.id.au",
     role = c("aut", "cre"))
 License: GPL-3

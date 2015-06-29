@@ -651,7 +651,7 @@ createProjectSkeleton <-function(
     ## copy templates - this should be in package using 'copyTemplate' or above
     mf <- c(mkfileHeader(),
             readLines(file.path(template.dir, "Makefile_base.txt")),
-            "", file.path(common.mk$dir, common.mk$file))
+            "", paste("include", file.path(common.mk$dir, common.mk$file)))
     mf <- gsub("@@READ.DIR@@", makeDirs[["readMerge"]], mf)
     mf <- gsub("@@WORK.DIR@@", makeDirs[["work"]], mf)
     mf <- gsub("@@REPORT.DIR@@", makeDirs[["reports"]], mf)
@@ -667,7 +667,7 @@ createProjectSkeleton <-function(
                        paste(MakefileLines$clean$targets, collapse = " ")))
     mf <- c(mkfileHeader(), mk.targ, MakefileLines$read$makefileLines,
             MakefileLines$clean$makefileLines, "",
-            file.path(common.mk$dir, common.mk$file))
+            paste("include ", file.path(common.mk$dir, common.mk$file)))
     writeLines(mf, mkfiler)
     close(mkfiler)
     cat("Wrote file:", mfname1r, "\n")
@@ -682,7 +682,7 @@ createProjectSkeleton <-function(
                              collapse = " ")))
     mf <- c(mkfileHeader(), mk.targ, MakefileLines$summary$makefileLines,
             MakefileLines$analyse$makefileLines, "",
-            file.path(common.mk$dir, common.mk$file))
+            paste("include", file.path(common.mk$dir, common.mk$file)))
     writeLines(mf, mkfiler)
     close(mkfiler)
     cat("Wrote file:", mfname1r, "\n")
@@ -696,7 +696,7 @@ createProjectSkeleton <-function(
     mk.targ <- c(".PHONY: all",
                  paste("all:", paste(targets, collapse = " ")))
     mf <- c(mkfileHeader(), mk.targ, mklines, "",
-            file.path(common.mk$dir, common.mk$file))
+            paste("include", file.path(common.mk$dir, common.mk$file)))
     writeLines(mf, mkfiler)
     close(mkfiler)
     cat("Wrote file:", mfname1r, "\n")
