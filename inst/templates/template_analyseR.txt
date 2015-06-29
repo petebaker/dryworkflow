@@ -73,10 +73,12 @@ str(@@DATAFRAME.INPUT@@)
 
 N.SAMPLE <- 100
 
-df1 <- ifelse(dim(@@DATAFRAME.INPUT@@)[1] > N.SAMPLE,
-       @@DATAFRAME.INPUT@@[sample(1:dim(@@DATAFRAME.INPUT@@)[1], N.SAMPLE),],
-       @@DATAFRAME.INPUT@@)
-
+if (dim(@@DATAFRAME.INPUT@@)[1] > N.SAMPLE){
+  df1 <- @@DATAFRAME.INPUT@@[sample(1:dim(@@DATAFRAME.INPUT@@)[1], N.SAMPLE),]
+} else {
+  df1 <- @@DATAFRAME.INPUT@@
+}
+       
 ## determine continuous and categorial variables
 
 num.vars <- names(df1)[sapply(df1, is.numeric)]
@@ -115,8 +117,8 @@ if (n.num > 0) { # simple linear regression on either continuous or categorical
 ## save analysis results if sensible and/or possible
 
 @@DATAFRAME.SAVED@@ <- list(data = @@DATAFRAME.INPUT@@,
-               	       mod1 = ifelse(exists(mod1), mod1, NULL),
-               	       effects1 = ifelse(exists(effects1), effects1, NULL))
+               	       mod1 = ifelse(exists("mod1"), mod1, NA),
+               	       effects1 = ifelse(exists("effects1"), effects1, NA))
 
 oldComment <- comment(@@DATAFRAME.INPUT@@)
 (newComment

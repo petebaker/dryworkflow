@@ -54,13 +54,13 @@ This is a template for the data file *@@DATAFILE@@*.
 - Bullet 3
 
 ```{r, echo=FALSE, messages=FALSE, warnings=FALSE, errors=TRUE}
-SUBSET <- TRUE               # subset - change this
+SUBSET <- FALSE              # to subset - change this
 if (SUBSET){
   N.VARS <- 5                # just summarise first 5 variables
   N.CASES <- 100             # just summarise first 100 rows
 }
 library(knitr)
-library(Rmarkdown)
+library(rmarkdown)
 library(pander)
 library(car)
 @@LIBRARIES@@
@@ -85,7 +85,7 @@ if (SUBSET){
 ## Summary Statistics
 
 ```{r, echo=FALSE, fig.cap = "Pairwise plots of variables"}
-if (exists(ggpairs1)) ggpairs1
+if (exists("ggpairs1")) ggpairs1
 ```
 
 
@@ -95,7 +95,8 @@ Data were cleaned and summary statistics presented here are for
 `r N.CASES` cases from `r N.VARS` variables.
 
 ```{r, results='asis'}
-knitr::kable(Rcmdr::numSummary(@@DATAFRAME.CLEAN@@))
+numericVars <- sapply(@@DATAFRAME.CLEAN@@, is.numeric)
+pander(RcmdrMisc::numSummary(@@DATAFRAME.CLEAN@@[,numericVars]))
 ```
 
 ## Statistical Analysis
@@ -103,8 +104,8 @@ knitr::kable(Rcmdr::numSummary(@@DATAFRAME.CLEAN@@))
 Ideally, you analyse data using *R* and simply output and discuss the
 results here.
 
-```{r, echo=FAlSE, results='asis'}
-if (exists(mod1) {
+```{r, echo=FALSE, results='asis'}
+if (exists("mod1")) {
   knitr::kable(summary(mod1))
 }
 ```

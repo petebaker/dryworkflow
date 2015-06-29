@@ -55,13 +55,13 @@ This is a template for the data file *@@DATAFILE@@*.
 accordingly and then remove this sentence.**
 
 ```{r, echo=FALSE, messages=FALSE, warnings=FALSE, errors=TRUE}
-SUBSET <- TRUE               # subset - change this
+SUBSET <- FALSE              # to subset - change this
 if (SUBSET){
   N.VARS <- 5                # just summarise first 5 variables
   N.CASES <- 100             # just summarise first 100 rows
 }
 library(knitr)
-library(Rmarkdown)
+library(rmarkdown)
 library(pander)
 library(car)
 @@LIBRARIES@@
@@ -85,9 +85,6 @@ if (SUBSET){
 
 # Summary Statistics
 
-**Note to self:** Guessing this may not work but should substitute
-  something that does.
-
 Data were cleaned and summary statistics presented here are for
 `r ifelse(SUBSET, "a subset of", "")`
 `r N.CASES` cases from `r N.VARS` variables.
@@ -98,7 +95,8 @@ Sometimes *numSummary* can produce problematic output for *knitr* but
 really should be OK given it is used inside R Commander.
 
 ```{r, results='asis'}
-knitr::kable(Rcmdr::numSummary(@@DATAFRAME.CLEAN@@))
+numericVars <- sapply(@@DATAFRAME.CLEAN@@, is.numeric)
+pander(RcmdrMisc::numSummary(@@DATAFRAME.CLEAN@@[,numericVars]))
 ```
 
 This may be useful too:
@@ -111,7 +109,7 @@ But I'm guessing this simply doesn't work. Table produced previously
 and so doesn't need redoing/recalculating but just outputting.
 
 ```{r, results='asis'}
-knitr::kable(table1)
+if (exists("table1")) knitr::kable(table1)
 ```
 
 ## Summary Plots
@@ -120,11 +118,11 @@ And perhaps some of these plots are present too from the summary step
 conducted previously.
 
 ```{r, echo=FALSE}
-if (exists(ggpairs1)) ggpairs1
+if (exists("ggpairs1")) ggpairs1
 ```
 
 ```{r, echo=FALSE}
-if (exists(mosaic1)) mosaic1
+if (exists("mosaic1")) mosaic1
 ```
 
 # Statistical Analysis
@@ -132,8 +130,8 @@ if (exists(mosaic1)) mosaic1
 Ideally, you analyse data using *R* and simply output and discuss the
 results here.
 
-```{r, echo=FAlSE, results='asis'}
-if (exists(mod1) {
+```{r, echo=FALSE, results='asis'}
+if (exists("mod1")) {
   knitr::kable(summary(mod1))
   knitr::kable(anova(mod1))
   knitr::kable(Anova(mod1))
@@ -143,17 +141,17 @@ if (exists(mod1) {
 And perhaps some residual plots
 
 ```{r, echo=FALSE}
-if (exists(mod1)) plot(mod1)
+if (exists("mod1")) plot(mod1)
 ```
 
 ```{r, echo=FALSE}
-if (exists(mod1)) car::residualPlots(mod1)
+if (exists("mod1")) car::residualPlots(mod1)
 ```
 
 If present than could plot effects.
 
 ```{r, echo=FALSE}
-if (exists(mod1)) {
+if (exists("mod1")) {
   library(effects)
   plot(allEffects(mod1))
 }

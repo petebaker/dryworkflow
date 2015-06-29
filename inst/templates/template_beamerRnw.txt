@@ -101,7 +101,7 @@ options(width=60)
 This is a template for the data file *@@DATAFILE@@*.
 
 <<setupDataAndInput, echo=FALSE, messages=FALSE, warnings=FALSE, errors=TRUE>>=
-SUBSET <- TRUE               # subset - change this
+SUBSET <- FALSE              # to subset - change this
 if (SUBSET){
   N.VARS <- 5                # just summarise first 5 variables
   N.CASES <- 100             # just summarise first 100 rows
@@ -109,7 +109,7 @@ if (SUBSET){
 library(Hmisc)
 library(xtable)
 library(knitr)
-library(Rmarkdown)
+library(rmarkdown)
 library(pander)
 library(car)
 @@LIBRARIES@@
@@ -145,7 +145,8 @@ begin{frame}[fragile]
   \frametitle{@@DATAFILE@@: Summary Table} 
 
   <<summary1, echo=FALSE, results='asis'>>=
-  knitr::kable(Rcmdr::numSummary(@@DATAFRAME.CLEAN@@))
+  numericVars <- sapply(@@DATAFRAME.CLEAN@@, is.numeric)
+  pander(RcmdrMisc::numSummary(@@DATAFRAME.CLEAN@@[,numericVars]))
   @
 
 \end{frame}  
@@ -154,7 +155,7 @@ begin{frame}[fragile]
   \frametitle{@@DATAFILE@@: Summary Plots} 
 
   <<plot1, echo=FALSE, fig.cap = "Pairwise plots of variables">>
-  if (exists(ggpairs1)) ggpairs1
+  if (exists("ggpairs1")) ggpairs1
   @
 
 \end{frame}  
@@ -162,8 +163,8 @@ begin{frame}[fragile]
 \begin{frame}[fragile]
   \frametitle{Statistical Analysis} 
 
-  <<stats1, echo=FAlSE, results='asis'>>=
-  if (exists(mod1)) knitr::kable(summary(mod1))
+  <<stats1, echo=FALSE, results='asis'>>=
+  if (exists("mod1")) knitr::kable(summary(mod1))
   @	
 
 \end{frame}  
@@ -172,7 +173,7 @@ begin{frame}[fragile]
   \frametitle{Effects plots} 
 
   <<effects1, echo=FALSE>>=
-    if (exists(mod1)) {
+    if (exists("mod1")) {
     library(effects)
     plot(allEffects(mod1))
   }  

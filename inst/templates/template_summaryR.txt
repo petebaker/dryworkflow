@@ -74,17 +74,16 @@ str(@@DATAFRAME.INPUT@@)
 N.SAMPLE <- 100
 N.COLS <- 10
 
-df1 <- ifelse(dim(@@DATAFRAME.INPUT@@)[1] > N.SAMPLE,
-       @@DATAFRAME.INPUT@@[sample(1:dim(@@DATAFRAME.INPUT@@)[1], N.SAMPLE),],
-       @@DATAFRAME.INPUT@@)
+if (dim(@@DATAFRAME.INPUT@@)[1] > N.SAMPLE){
+  df1 <- @@DATAFRAME.INPUT@@[sample(1:dim(@@DATAFRAME.INPUT@@)[1], N.SAMPLE),] 
+} else {
+  df1 <- @@DATAFRAME.INPUT@@
+}
 
 ## Summary statistics:
 
 cat("Summary statistics for (possibly a sample of) '@@DATAFRAME.INPUT@@':\n")
 summary(df1)
-if (require(RcmdrMisc))	{
-  RcmdrMisc::numSummary(df1)
-}
     
 ### Example: simple plot of data
 
@@ -98,6 +97,9 @@ num.vars <- names(df1)[sapply(df1, is.numeric)]
 fac.vars <- names(df1)[sapply(df1, function(x) is.factor(x) && nlevels(x)<=5)]
 (n.fac <- length(fac.vars)) # no. of factors with 5 or less levels
 
+if (require(RcmdrMisc))	{
+  RcmdrMisc::numSummary(df1[,num.vars])
+}
 if (n.num > 0 & n.fac > 0) { # boxplot if at least 1 numeric and 1 factor
   x <- num.vars[1]
   y <- fac.vars[1] # just in case ID stored as numeric
@@ -114,11 +116,11 @@ if (n.num > 0 & n.fac > 0) { # boxplot if at least 1 numeric and 1 factor
   if (require(Hmisc)){
     if (n.num > 6) {
       x <- num.vars[1:6]
-      form3 <- formula(paste(y,'~', collapse(x, sep="+")))
+      form3 <- formula(paste(y,'~', paste(x, collapse="+")))
     } else {
-    form3 <- formula(paste(y,'~', collapse(num.vars, sep="+")))
+    form3 <- formula(paste(y,'~', paste(num.vars, collapse="+")))
     }
-  table1 <- Hmisc::summary(form3, data = df1, method="reverse")
+  table1 <- Hmisc::summary.formula(form3, data = df1, method="reverse")
   cat("Example summary table using 'Hmisc'")
   print(table1)
   } else {
@@ -140,7 +142,7 @@ if (n.fac>1) { # if at least 2 factors - plot first 2 if vcd installed
 
 ## Example of ggplot2 pairs plot from GGally
 if (require(GGally)){
-  ncols <- ncols(df1)
+  ncols <- ncol(df1)
   if (ncols > 6) {
     ggpairs1 <- GGally::ggpairs(df1[,1:6])
   } else {
@@ -156,8 +158,9 @@ if (require(GGally)){
 ## save some summary results if sensible
 
 @@DATAFRAME.SAVED@@ <- list(data = @@DATAFRAME.INPUT@@,
-               	        table1 = ifelse(exists(table1), table1, NULL),
-	                ggpairs1 = ifelse(exists(ggpairs1), ggpairs1, NULL))
+               	        table1 = ifelse(exists("table1"), table1, NA),
+	                ggpairs1 = ifelse(exists("ggpairs1"), ggpairs1, NA),
+	                ggpairs1 = ifelse(exists("mosaic1"), mosaic1, NA))
 
 oldComment <- comment(@@DATAFRAME.INPUT@@)
 (newComment
@@ -167,5 +170,5 @@ comment(@@DATAFRAME.SAVED@@) <- c(newComment, oldComment)
 
 ### Store summary data for subsequent analysis/reports  ----------------
 
-save(@@DATAFRAME.SAVED@@, ggpairs1, mosaic1, table1, 
+save(@@DATAFRAME.SAVED@@,
   file = file.path("@@DIR.DATA.SAVED@@", "@@RDATA.SAVED@@"))

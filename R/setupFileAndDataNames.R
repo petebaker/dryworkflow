@@ -215,7 +215,7 @@ setupFileAndDataNames <-
   names(suffix) <- c("read", "clean", "summary", "analyse")
   dataFrames <-
     lapply(allRsyntax, function(y){
-      stringr::str_c(stringr::str_replace( dataFiles, "\\.", "_"),
+      stringr::str_c(stringr::str_replace( dataFiles, "\\.|-", "_"),
                     suffix[y])})
   names(dataFrames) <- allRsyntax
 

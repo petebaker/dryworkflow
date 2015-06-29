@@ -1,9 +1,10 @@
+MAKE=make
 READ=@@READ.DIR@@
 WORK=@@WORK.DIR@@
 REPORTS=@@REPORT.DIR@@
 outputs=$(READ) $(WORK) $(REPORTS)
 
-.PHONY: all
+.PHONY: all $(outputs)
 all: $(outputs)
 
 $(outputs):

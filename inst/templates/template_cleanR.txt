@@ -77,8 +77,7 @@ names(@@DATAFRAME.SAVED@@)
 ### Store data for subsequent analysis  --------------------------
 
 oldComment <- comment(@@DATAFRAME.SAVED@@)
-newComment
-  <- paste("Data '@@DATAFRAME.INPUT@@' from '@@RDATA.INPUT@@' cleaned at", date())
+newComment  <- paste("Data '@@DATAFRAME.INPUT@@' from '@@RDATA.INPUT@@' cleaned at", date())
 comment(@@DATAFRAME.SAVED@@) <- c(newComment, oldComment)
 
 save(@@DATAFRAME.SAVED@@,
